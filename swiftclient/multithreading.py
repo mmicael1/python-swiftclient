@@ -23,6 +23,7 @@ from six.moves.queue import PriorityQueue
 
 
 class OutputManager(object):
+
     """
     One object to manage and provide helper functions for output.
 
@@ -97,8 +98,14 @@ class OutputManager(object):
         self.error_count += 1
         return self._print(item, stream=self.error_stream)
 
+    # Waiting thread to shutdown bug #973557
+    def shutdown(self, wait=True):
+        self.error_print_pool.shutdown(wait=wait)
+        self.print_pool.shutdown(wait=wait)
+
 
 class MultiThreadingManager(object):
+
     """
     One object to manage context for multi-threading.  This should make
     bin/swift less error-prone and allow us to test this code.
@@ -107,7 +114,6 @@ class MultiThreadingManager(object):
     def __init__(self, create_connection, segment_threads=10,
                  object_dd_threads=10, object_uu_threads=10,
                  container_threads=10):
-
         """
         :param segment_threads: The number of threads allocated to segment
                                 uploads
@@ -138,6 +144,7 @@ class MultiThreadingManager(object):
 
 
 class ConnectionThreadPoolExecutor(ThreadPoolExecutor):
+
     """
     A wrapper class to maintain a pool of connections alongside the thread
     pool. We start by creating a priority queue of connections, and each job
@@ -149,6 +156,7 @@ class ConnectionThreadPoolExecutor(ThreadPoolExecutor):
     By using a PriorityQueue we avoid creating more connections than required.
     We will only create as many connections as are required concurrently.
     """
+
     def __init__(self, create_connection, max_workers):
         self._connections = PriorityQueue()
         self._create_connection = create_connection

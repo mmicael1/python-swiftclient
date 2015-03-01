@@ -107,7 +107,7 @@ def st_delete(parser, args, output_manager):
                     output_manager.error(
                         'WARNING: / in container name; you '
                         'might have meant %r instead of %r.' % (
-                        container.replace('/', ' ', 1), container)
+                            container.replace('/', ' ', 1), container)
                     )
                     return
                 objects = args[1:]
@@ -250,7 +250,7 @@ def st_download(parser, args, output_manager):
                     output_manager.error(
                         'WARNING: / in container name; you '
                         'might have meant %r instead of %r.' % (
-                        container.replace('/', ' ', 1), container)
+                            container.replace('/', ' ', 1), container)
                     )
                     return
                 objects = args[1:]
@@ -1302,6 +1302,9 @@ Examples:
             globals()['st_%s' % args[0]](parser, argv[1:], output)
         except (ClientException, RequestException, socket.error) as err:
             output.error(str(err))
+
+    # Waiting thread to shutdown bug #973557
+    output.shutdown(wait=True)
 
     if output.error_count > 0:
         exit(1)
